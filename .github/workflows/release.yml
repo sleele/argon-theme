@@ -20,6 +20,7 @@ jobs:
           mkdir /tmp/argon
           cp -r ./* /tmp/argon
           cd /tmp
+          chown -R 33:33 argon
           zip -q -r argon.zip argon
       - name: Generate release tag
         id: tag
