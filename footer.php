@@ -2,8 +2,9 @@
 						<?php
 							echo get_option('argon_footer_html');
 						?>
-						<div>Theme <a href="https://github.com/solstice23/argon-theme" target="_blank"><strong>Argon</strong></a><?php if (get_option('argon_hide_footer_author') != 'true') {echo " By solstice23"; }?></div>
-					</footer>
+						<div>COPYRIGHT <?php echo date('Y'); ?>  <a href="https://sleele.com"><strong>SLEELE的博客</strong></a>. ALL RIGHTS RESERVED.</div> 
+					    <div>Theme is <a href="https://github.com/solstice23/argon-theme">Argon</a><?php if (get_option('argon_hide_footer_author') != 'true') {echo " By solstice23"; }?></div>
+ 					</footer>
 				</main>
 			</div>
 		</div>
@@ -82,3 +83,17 @@
 <?php echo get_option('argon_custom_html_foot'); ?>
 
 </html>
+
+<?php if  ( is_singular() && !is_user_logged_in() ) : ?>
+  <!-- ajax post view -->
+  <!-- ajax post view -->
+  <script type= "text/javascript" >
+$.ajax({ 
+type:'POST', 
+url: "https://sleele.com/wp-content/themes/argon/wp-ajax-postviews.php" ,   /*此处需要修改为自己的php路径*/
+data: { 
+"postviews_id" : "<?php the_ID();?>" 
+} 
+}); 
+  </script>
+<?php endif ; ?>

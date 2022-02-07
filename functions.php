@@ -14,7 +14,7 @@ $GLOBALS['theme_version'] = $argon_version;
 $argon_assets_path = get_option("argon_assets_path");
 switch ($argon_assets_path) {
     case "jsdelivr":
-	    $GLOBALS['assets_path'] = "https://cdn.jsdelivr.net/gh/solstice23/argon-theme@" . $argon_version;
+	    $GLOBALS['assets_path'] = "https://cdn.jsdelivr.net/gh/sleele/argon-theme@" . $argon_version;
         break;
     case "fastgit":
 	    $GLOBALS['assets_path'] = "https://raw.fastgit.org/solstice23/argon-theme/v" . $argon_version;
@@ -2270,7 +2270,8 @@ function argon_get_post_outdated_info(){
 		$delta = 2147483647;
 	}
 	$post_date_delta = floor((current_time('timestamp') - get_the_time("U")) / (60 * 60 * 24));
-	$modify_date_delta = floor((current_time('timestamp') - get_the_modified_time("U")) / (60 * 60 * 24));
+	// $modify_date_delta = floor((current_time('timestamp') - get_the_modified_time("U")) / (60 * 60 * 24));
+	$modify_date_delta = get_the_modified_time( 'Y年m月j日' );
 	if (get_option("argon_outdated_info_time_type") == "createdtime"){
 		$date_delta = $post_date_delta;
 	}else{
@@ -5110,7 +5111,7 @@ function init_nav_menus(){
 }
 
 //隐藏 admin 管理条
-//show_admin_bar(false);
+show_admin_bar(false);
 
 /*说说*/
 add_action('init', 'init_shuoshuo');
@@ -5195,3 +5196,189 @@ function argon_login_page_style() {
 if (get_option('argon_enable_login_css') == 'true'){
 	add_action('login_head', 'argon_login_page_style');
 }
+
+
+/**
+ * 关闭核心提示
+ */
+add_filter('pre_site_transient_update_core', create_function('$a', "return null;"));
+ 
+/**
+ * WordPress 自动为新文章添加已使用过的标签
+ */
+function array2object($array) { // 数组转对象
+    if (is_array($array)) {
+      $obj = new StdClass();
+      foreach ($array as $key => $val){
+        $obj->$key = $val;
+      }
+    }
+    else {
+      $obj = $array;
+    }
+    return $obj;
+  }
+  function object2array($object) { // 对象转数组
+    if (is_object($object)) {
+      foreach ($object as $key => $value) {
+        $array[$key] = $value;
+      }
+    }
+    else {
+      $array = $object;
+    }
+    return $array;
+  }
+  add_action('save_post', 'auto_add_tags');
+  function auto_add_tags(){
+    $tags = get_tags( array('hide_empty' => false) );
+    $post_id = get_the_ID();
+    $post_content = get_post($post_id)->post_content;
+    $count = count(wp_get_post_tags($post_id));
+    if ($tags && $count < 3) {
+      $i = 0;
+      $arrs = object2array($tags);shuffle($arrs);$tags = array2object($arrs);// 打乱顺序
+      foreach ( $tags as $tag ) {
+      // 如果文章内容出现了已使用过的标签，自动添加这些标签
+        if ( strpos($post_content, $tag->name) !== false){
+          if ($i == 5) { // 控制输出数量
+            break;
+          }
+          wp_set_post_tags( $post_id, $tag->name, true );
+          $i++;
+        }
+      }
+    }
+  }
+ 
+ 
+/**
+ * 添加文章版权信息
+ */
+add_filter('the_content', 'wp_copyright');
+function wp_copyright($content)
+{
+    if (is_single() || is_feed() ) {
+        $content .= '<div class="post-copyright"  style="border:#3699dc 2px solid;border-radius:5px 5px 5px 5px;padding:10px 5px 10px 20px;">
+        <i class="fa fa-bullhorn"></i> 原创声明<br/>本文由 <a href="https://sleele.com" title="sleele的博客\'s Blog https://sleele.com"> NG6 </a>于' . get_the_time('Y年m月d日') . '发表在<a href="https://sleele.com" title="sleele的博客\'s Blog https://sleele.com"> sleele的博客 </a><br/>如未特殊声明，本站所有文章均为原创；你可以在保留作者及<a href="' . get_permalink() . '"title="' . get_permalink() . '">原文地址</a>的情况下转载<br/>转载请注明：<a href="' . get_permalink() . '"title="' . get_permalink() . '">' . get_the_title() . ' | ' . get_bloginfo('name') . '</a></div>';
+    }
+    return $content;
+}
+ 
+# 禁用 wp-emoji-release.min.js
+function disable_emoji_feature() {
+	
+	// Prevent Emoji from loading on the front-end
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+ 
+	// Remove from admin area also
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+ 
+	// Remove from RSS feeds also
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji');
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji');
+ 
+	// Remove from Embeds
+	remove_filter( 'embed_head', 'print_emoji_detection_script' );
+ 
+	// Remove from emails
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+ 
+	// Disable from TinyMCE editor. Currently disabled in block editor by default
+	add_filter( 'tiny_mce_plugins', 'disable_emojis_tinymce' );
+ 
+	/** Finally, prevent character conversion too
+         ** without this, emojis still work 
+         ** if it is available on the user's device
+	 */
+ 
+	add_filter( 'option_use_smilies', '__return_false' );
+ 
+}
+ 
+function disable_emojis_tinymce( $plugins ) {
+	if( is_array($plugins) ) {
+		$plugins = array_diff( $plugins, array( 'wpemoji' ) );
+	}
+	return $plugins;
+}
+ 
+add_action('init', 'disable_emoji_feature');
+ 
+// 评论添加@，by Ludou
+function sleele_comment_add_at( $comment_text, $comment = '') {
+	if( $comment->comment_parent > 0) {
+	  $comment_text = '@<a href="#comment-' . $comment->comment_parent . '">'.get_comment_author( $comment->comment_parent ) . '</a> ' . $comment_text;
+	}
+  
+	return $comment_text;
+  }
+add_filter( 'comment_text' , 'sleele_comment_add_at', 20, 2);
+ 
+// 设置浏览器缓存时间
+function Cache_Control(){
+    if ( is_admin() ) {
+        header('Cache-Control: no-cache, must-revalidate, max-age=0');
+    } else {
+        header('Cache-Control: max-age=1800');
+	}
+	$expts = gmdate("D, d M Y H:i:s", time() + 1800) . " GMT";
+	header("Expires: $expts");
+}
+add_action( 'wp', 'Cache_Control' );
+ 
+// 关闭xmlrpc pingback
+add_filter( 'xmlrpc_methods', 'remove_xmlrpc_pingback_ping' );
+    function remove_xmlrpc_pingback_ping( $methods ) {
+    unset( $methods['pingback.ping'] );
+    return $methods;
+}
+ 
+/*
+ * 通过Link标签的src地址判断后反注册禁用谷歌字体加载.
+ */
+if (!function_exists('disable_google_fonts')) {
+    function drgf_dequeueu_fonts()
+    {
+        global $wp_styles;
+ 
+        if (!($wp_styles instanceof WP_Styles)) {
+            return;
+        }
+ 
+        $allowed = apply_filters('drgf_exceptions', ['olympus-google-fonts']);
+ 
+        foreach ($wp_styles->registered as $style) {
+            $handle = $style->handle;
+            $src = $style->src;
+            $exist = strpos($src, 'fonts.googleapis');
+            if (false !== $exist) {
+                if (!array_key_exists($handle, array_flip($allowed))) {
+                    wp_dequeue_style($handle);
+                    wp_deregister_style($handle);
+                    wp_register_style($handle, '');
+                }
+            }
+        }
+    }
+    add_action('wp_enqueue_scripts', 'drgf_dequeueu_fonts', 999);
+    add_action('admin_enqueue_scripts', 'drgf_dequeueu_fonts', 999);
+    add_action('login_enqueue_scripts', 'drgf_dequeueu_fonts', 999);
+ 
+    /*
+     * 禁用 Elementor 插件加载的谷歌字体.
+     */
+    add_filter('elementor/frontend/print_google_fonts', '__return_false');
+}
+# 替换外链图为本地地址
+function replace_text_wps($text){
+    $replace = array(
+    'https://sleele.com/wp-content/uploads/uPic' => 'https://sleele.com/wp-content/uploads/uPic', 
+    );
+    $text = str_replace(array_keys($replace), $replace, $text);
+    return $text;
+}
+add_filter('the_content', 'replace_text_wps');
+add_filter('the_excerpt', 'replace_text_wps');

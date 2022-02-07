@@ -84,8 +84,8 @@
 		<form>
 			<div class="row">
 				<div class="col-md-12">
-					<textarea id="post_comment_content" class="form-control form-control-alternative" placeholder="<?php echo apply_filters("argon_comment_textarea_placeholder", __('评论内容', 'argon'));?>" name="comment" style="height: 80px;"></textarea>
-				</div>
+					<textarea id="post_comment_content" class="form-control form-control-alternative" placeholder="<?php _e('请填写昵称（填写邮箱后可获得回复通知）后评论，评论将在审核后通过（评论支持Markdown和QQ头像）', 'argon');?>" name="comment" style="height: 80px;"></textarea>
+   				</div>
 				<div class="col-md-12" style="height: 0;overflow: hidden;">
 					<pre id="post_comment_content_hidden" class=""></pre>
 				</div>

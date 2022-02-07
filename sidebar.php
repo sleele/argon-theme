@@ -61,12 +61,12 @@
 				}
 				echo "</ul>";
 			?>
-			<div class="card-body text-center leftbar-search-button">
+			<!-- <div class="card-body text-center leftbar-search-button">
 				<button id="leftbar_search_container" class="btn btn-secondary btn-lg active btn-sm btn-block border-0" role="button">
 					<i class="menu-item-icon fa fa-search mr-0"></i> <?php _e('搜索', 'argon');?>
 					<input id="leftbar_search_input" type="text" placeholder="<?php _e('搜索什么...', 'argon');?>" class="form-control form-control-alternative" autocomplete="off">
 				</button>
-			</div>
+			</div> -->
 		</div>
 		<div id="leftbar_part2" class="widget widget_search card bg-white shadow-sm border-0">
 			<div id="leftbar_part2_inner" class="card-body">
