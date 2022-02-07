@@ -17,11 +17,9 @@ jobs:
 
       - name: Packaging files
         run: |
-          mkdir /tmp/argon
-          cp -r ./* /tmp/argon
-          cd /tmp
-          chown -R 33:33 argon
-          zip -q -r argon.zip argon
+          git clone https://github.com/sleele/argon-theme.git --depth=1 argon
+          zip -q -r argon.zip ./argon
+          ls -lsh *.zip
       - name: Generate release tag
         id: tag
         run: |
@@ -37,4 +35,4 @@ jobs:
           prerelease: false
           # body_path: Changelog.md
           files: |
-            /tmp/argon.zip 
+            ./*.zip 
