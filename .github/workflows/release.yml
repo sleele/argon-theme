@@ -18,6 +18,8 @@ jobs:
       - name: Packaging files
         run: |
           git clone https://github.com/sleele/argon-theme.git --depth=1 argon
+          rm -rf ./argon/.git
+          rm -rf ./argon/.github
           zip -q -r argon.zip ./argon
           ls -lsh *.zip
       - name: Generate release tag
