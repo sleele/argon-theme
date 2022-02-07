@@ -19,7 +19,8 @@ jobs:
         run: |
           mkdir /tmp/argon
           cp -r ./* /tmp/argon
-          zip -q -r argon.zip /tmp/argon
+          cd /tmp
+          zip -q -r argon.zip argon
       - name: Generate release tag
         id: tag
         run: |
