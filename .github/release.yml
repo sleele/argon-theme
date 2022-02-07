@@ -1,0 +1,37 @@
+# GitHub Action
+
+name: Upload files to release
+
+on:
+  push:
+    paths:
+      - "ReleaseTag"
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v2
+
+      - name: Packaging files
+        run: |
+          zip -q -r argon.zip ./*
+          ls -lsh *.zip
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(cat ReleaseTag)"
+          cat ReleaseTag
+      - name: Upload files to release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: v${{ steps.tag.outputs.release_tag }}
+          tag_name: v${{ steps.tag.outputs.release_tag }}
+          prerelease: false
+          # body_path: Changelog.md
+          files: |
+            ./*.zip 
