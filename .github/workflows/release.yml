@@ -17,8 +17,9 @@ jobs:
 
       - name: Packaging files
         run: |
-          zip -q -r argon.zip ./*
-          ls -lsh *.zip
+          mkdir /tmp/argon
+          cp -r ./* /tmp/argon
+          zip -q -r argon.zip /tmp/argon
       - name: Generate release tag
         id: tag
         run: |
@@ -34,4 +35,4 @@ jobs:
           prerelease: false
           # body_path: Changelog.md
           files: |
-            ./*.zip 
+            /tmp/argon.zip 
